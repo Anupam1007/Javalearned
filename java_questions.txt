@@ -1,0 +1,9 @@
+﻿(1) Create a class without a constructor, and then create an object of that
+class in main( ) to verify that the default constructor is automatically synthesized.
+
+
+search-> just because a reference to an object is private inside a class doesn’t
+mean that some other object can’t have a public reference to the same object.
+
+
+2.inner classes and anonymous classes give compiled class in the form classname$1.class. like this. study on this

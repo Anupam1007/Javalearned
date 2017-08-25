@@ -1,0 +1,1021 @@
+Test(String s)
+	{
+		this.s="etra";
+		System.out.print(s); // in this if the class variable is s too, then it is not printed unless specified by this.s
+	}
+	
+------------------------------------------------------------------------------explicit static initialization
+class Cups {
+	static Cup cup1;
+	static Cup cup2;
+	static {
+		cup1 = new Cup(1);
+		cup2 = new Cup(2);
+	}
+	Cups() {
+		print("Cups()");
+}
+
+----------------------------------------------------------------------------- pass varargs
+public class VarArgs {
+static void printArray(Object[] args) {
+	for(Object obj : args)
+		System.out.print(obj + " ");
+	System.out.println();
+}
+
+//or
+
+public class NewVarArgs {
+static void printArray(Object... args) {
+for(Object obj : args)
+System.out.print(obj + " ");
+System.out.println();
+}
+
+
+------------------------------------------------------------------------------
+package first;
+
+import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
+
+class Book {
+	 public static void f(float i, String... args) {
+		for(String s:args)
+			System.out.println(s);
+	}
+	
+}
+	
+public class First1 {
+	
+	 public static void main(String[] args) {
+
+		Book b=new Book();
+		Book.f(4.1f,"a","b","c");
+
+		}
+}
+
+------------------------------------------------------------------------------------ENUM
+public class SimpleEnumUse {
+public static void main(String[] args) {
+Spiciness howHot = Spiciness.MEDIUM;
+System.out.println(howHot);
+}
+}
+---------------------------------------------------------------------------------------
+1.When you create a source-code file for Java, it’s commonly called a compilation unit
+(sometimes a translation unit). Each compilation unit must have a name ending in .java,
+and inside the compilation unit there can be a public class that must have the same name as
+the file (including capitalization, but excluding the .java file name extension). There can be
+only one public class in each compilation unit; otherwise, the compiler will complain. If
+there are additional classes in that compilation unit, they are hidden from the world outside
+that package because they’re not public, and they comprise “support” classes for the main
+public class.
+
+2. the package statement must be the first non-comment code in the file.
+---------------------------------------------------------------------------------------
+
+if the file full path is ->  C:\DOC\JavaT\net\mindview\simple
+and the package is -> package net.mindview.simple;
+then CLASSPATH must contain -> CLASSPATH=C:\DOC\JavaT
+
+CLASSPATH can contain a number of alternative search paths.
+
+When the compiler encounters the import statement for the simple library, it begins
+searching at the directories specified by CLASSPATH, looking for subdirectory
+net/mindview/simple, then seeking the compiled files of the appropriate names
+(Vector.class for Vector, and List.class for List). Note that both the classes and the
+desired methods in Vector and List must be public.
+
+Imp- It’s worth remembering that anytime you create a package, you implicitly specify a directory
+structure when you give the package a name. The package must live in the directory indicated
+by its name, which must be a directory that is searchable starting from the CLASSPATH.
+
+Conditional compiling is not supported in java but it can be achieved by using different packages
+which would in turn differentiate the debug mode and product mode.
+
+
+liked this line-> private allows you to freely change that member without concern that it will
+affect another class in the same package.
+
+
+-----------------
+class Sundae {
+private Sundae() {} // prevents inheritance, check it 
+static Sundae makeASundae() {
+return new Sundae();
+}
+}
+public class IceCream {
+public static void main(String[] args) {
+//! Sundae x = new Sundae();
+Sundae x = Sundae.makeASundae();
+}
+}
+
+note-> classes in the
+same directory are part of the “default” package.
+
+remember	->Access control is often referred to as implementation hiding. Wrapping data and methods
+within classes in combination with implementation hiding is often called encapsulation. 5
+The result is a data type with characteristics and behaviors.
+
+
+Note that a class cannot be private (that would make it inaccessible to anyone but the class)
+or protected. 6 So you have only two choices for class access: package access or public.If
+you don’t want anyone else to have access to that class, you can make all the constructors
+private, thereby preventing anyone but you, inside a static member of the class, from
+creating an object of that class.
+
+for above refer page 159
+
+temp://: access/Lunch.java
+// Demonstrates class access specifiers. Make a class
+// effectively private with private constructors:
+class Soup1 {
+private Soup1() {}
+// (1) Allow creation via static method:
+public static Soup1 makeSoup() {
+return new Soup1();
+}
+}
+class Soup2 {
+private Soup2() {}
+// (2) Create a static object and return a reference
+// upon request.(The "Singleton" pattern):
+private static Soup2 ps1 = new Soup2();
+public static Soup2 access() {
+return ps1;
+}
+public void f() {}
+}
+// Only one public class allowed per file:
+public class Lunch {
+void testPrivate() {
+// Can’t do this! Private constructor:
+//! Soup1 soup = new Soup1();
+}
+void testStatic() {
+Soup1 soup = Soup1.makeSoup();
+}
+void testSingleton() {
+Soup2.access().f();
+}
+} ///:~
+Up to now, most of the methods have been returning either void or a primitive type, so the
+definition:
+public static Soup1 makeSoup() {
+return new Soup1();
+}
+
+over:
+
+
+
+************************************************reusing classes
+
+ you simply create objects of your
+existing class inside the new class. This is called composition, because the new class is
+composed of objects of existing classes. You’re simply reusing the functionality of the code,
+not its form.
+
+ creates a new class as a type of an existing class. You
+literally take the form of the existing class and add code to it without modifying the existing
+class. This technique is called inheritance, and the compiler does most of the work.
+Inheritance is one of the cornerstones of object-oriented programming, and has additional
+implications that will be explored in the Polymorphism chapter.
+
+
+--------------------------------------------------INHERITANCE
+
+unless you explicitly inherit from
+some other class, you implicitly inherit from Java’s standard root class Object
+
+
+When you inherit,(using extends) you automatically get all the fields and
+methods in the base class.
+
+Even if a class has package
+access, a public main() is accessible.this means that even if we dont write public class, main can be called.
+
+Java has the keyword super
+that refers to the “superclass” that the current class inherits.
+
+||||||||||||||||||||||||||||||||||||||||||below is exmple of constructor invocation sequence in case of inheritance
+class Art {
+Art() { print("Art constructor"); }
+}
+class Drawing extends Art {
+Drawing() { print("Drawing constructor"); }
+}
+public class Cartoon extends Drawing {
+public Cartoon() { print("Cartoon constructor"); }
+public static void main(String[] args) {
+Cartoon x = new Cartoon();
+}
+} /* Output:
+Art constructor
+Drawing constructor
+Cartoon constructor
+*///:~
+You can see that the construction happens from the base “outward,” so the base class is
+initialized before the derived-class constructors can access it. Even if you don’t create a
+constructor for Cartoon( ), the compiler will synthesize a default constructor for you that
+calls the base class constructor.
+
+||||||||||||||||||||||||||||||||||||||||||below example to call base class constructor
+
+class BoardGame extends Game {
+BoardGame(int i) {
+super(i);
+print("BoardGame constructor");
+}
+}
+
+
+|||||||||||||||||||||||||||||||-----------delegation example:-
+public class SpaceShipDelegation {
+	private String name;
+	private SpaceShipControls controls = new SpaceShipControls();//another class object is being created
+public SpaceShipDelegation(String name) {
+	this.name = name;
+}
+// Delegated methods:
+public void back(int velocity) {
+	controls.back(velocity); //chosing the SpaceShipControls methods
+}
+public void down(int velocity) {
+	controls.down(velocity);
+}
+public void forward(int velocity) {
+	controls.forward(velocity);
+}
+public void left(int velocity) {
+	controls.left(velocity);
+}
+public void right(int velocity) {
+	controls.right(velocity);
+}
+public void turboBoost() {
+	controls.turboBoost();
+}
+public void up(int velocity) {
+	controls.up(velocity);
+}
+public static void main(String[] args) {
+
+	 SpaceShipDelegation protector =
+	new SpaceShipDelegation("NSEA Protector");
+	protector.forward(100);
+}
+}
+//int the above example another class object is being created
+//however java doesnt support delegation
+
+
+-----------------
+ if you want
+something cleaned up for a class, you must explicitly write a special method to do it, and
+make sure that the client programmer knows that they must call this method. On top of
+this—as described in the Error Handling with Exceptions chapter—you must guard against
+an exception by putting such cleanup in a finally clause.
+
+public static void main(String[] args) {
+CADSystem x = new CADSystem(47);
+try {
+// Code and exception handling...
+} finally {
+x.dispose();
+}
+}
+//explanation for above code:-
+The try keyword indicates that the block
+that follows (delimited by curly braces) is a guarded region, which means that it is given
+176 Thinking in Java Bruce Eckel
+special treatment. One of these special treatments is that the code in the finally clause
+following this guarded region is always executed, no matter how the try block exits. (With
+exception handling, it’s possible to leave a try block in a number of non-ordinary ways.)
+Here, the finally clause is saying “always call dispose( ) for x, no matter what happens.”
+
+note:very important// The order of cleanup is the reverse of the order of initialization:
+this means that first clean our own class first the the base class.
+
+
+
+------------------------------
+If a Java base class has a method name that’s overloaded several times, redefining that
+method name in the derived class will not hide any of the base-class versions (unlike C++).
+Thus overloading works regardless of whether the method was defined at this level or in a
+base class
+example:-in below example it is to be noted that all the three methods exist.
+class Homer {
+	char doh(char c) {
+		print("doh(char)");
+		return ‘d’;
+	}
+	float doh(float f) {
+		print("doh(float)");
+		return 1.0f;
+	}
+}
+class Milhouse {}
+
+class Bart extends Homer {
+	void doh(Milhouse m) {
+	print("doh(Milhouse)");
+}
+}
+
+
+
+-------------
+Java SE5 has added the @Override annotation, which is not a keyword but can be used as if
+it were. When you mean to override a method, you can choose to add this annotation and the
+compiler will produce an error message if you accidentally overload instead of overriding.
+example:-
+// {CompileTimeError} (Won’t compile) - idont know what is this
+@Override void doh(Milhouse m) {//code}
+
+The @Override annotation will thus prevent you from accidentally overloading when you
+don’t mean to.
+
+
+-----------------
+The is-a relationship is expressed with
+inheritance, and the has-a relationship is expressed with composition.
+
+
+just for reference see beolow code:
+class Engine {
+public void start() {}
+public void rev() {}
+public void stop() {}
+}
+class Wheel {
+public void inflate(int psi) {}
+}
+class Window {
+public void rollup() {}
+public void rolldown() {}
+}
+class Door {
+public Window window = new Window();
+public void open() {}
+public void close() {}
+}
+public class Car {
+public Engine engine = new Engine();
+public Wheel[] wheel = new Wheel[4];
+public Door
+left = new Door(),
+right = new Door(); // 2-door
+public Car() {
+for(int i = 0; i < 4; i++)
+wheel[i] = new Wheel();
+}
+public static void main(String[] args) {
+Car car = new Car();
+car.left.window.rollup();
+car.wheel[0].inflate(72);
+}
+}
+
+----------------------PROTECTED
+In Java, protected also provides package access.
+following is an example tu use super.toString() method from the base class;
+public String toString() {
+return "Orc " + orcNumber + ": " + super.toString();
+}
+
+
+----------------------------------UPCASTING
+
+class Instrument {
+public void play() {}
+static void tune(Instrument i) {
+// ...
+	i.play();
+}
+}
+// Wind objects are instruments
+// because they have the same interface:
+public class Wind extends Instrument {
+public static void main(String[] args) {
+Wind flute = new Wind();
+Instrument.tune(flute); // Upcasting because the wind object will be catched in a Instrument type object
+}
+}
+
+
+
+
+point:The Polymorphism chapter provides one of the most compelling reasons for
+	upcasting, but if you remember to ask “Do I need to upcast?” you’ll have a good tool for
+	deciding between composition and inheritance.
+-------------------------------------------------FINAL Keyword
+When final is used with object references rather than primitives, the meaning can be
+confusing. With a primitive, final makes the value a constant, but with an object reference,
+final makes the reference a constant. Once the reference is initialized to an object, it can
+never be changed to point to another object. However, the object itself can be modified; Java
+does not provide a way to make any arbitrary object a constant. (You can, however, write
+your class so that objects have the effect of being constant.) This restriction includes arrays,
+which are also objects
+
+
+
+
+Note that final static primitives with constant initial values (that is,
+compile-time constants) are named with all capitals by convention, with words separated by
+underscores	
+
+Final or static finals can be generated at run time also.
+
+********************VERY IMPORTANT FOLLOWING NOTE: DIFFERENCE BETWEEN FINAL AND STATIC FINAL, THEY CAN BE SHOWN IN RUN TIME
+Just because something is final doesn’t mean that its value is known at compile time.
+This is demonstrated by initializing i4 and INT_5 at run time using randomly generated numbers.
+This difference shows up only when the values are initialized at run time, since
+the compile-time values are treated the same by the compiler. (And presumably optimized
+out of existence.) The difference is shown when you run the program. Note that the values of
+i4 for fd1 and fd2 are unique, but the value for INT_5 is not changed by creating the second
+FinalData object. That’s because it’s static and is initialized once upon loading and not
+each time a new object is created.
+
+-------------------------BLANK FINAL
+class Poppet {
+private int i;
+Poppet(int ii) { i = ii; }
+}
+public class BlankFinal {
+private final int i = 0; // Initialized final
+private final int j; // Blank final
+private final Poppet p; // Blank final reference
+// Blank finals MUST be initialized in the constructor:
+public BlankFinal() {
+j = 1; // Initialize blank final
+p = new Poppet(1); // Initialize blank final reference
+}
+public BlankFinal(int x) {
+j = x; // Initialize blank final
+p = new Poppet(x); // Initialize blank final reference
+}
+public static void main(String[] args) {
+new BlankFinal();
+new BlankFinal(47);
+}
+
+//fayda=final field inside a class can now be different for each object, and yet it retains its immutable quality
+
+--------------------FINAL ARGUMENTS
+Java allows you to make arguments final by declaring them as such in the argument list.
+This means that inside the method you cannot change what the argument reference points
+to.
+This feature is primarily used to pass data to anonymous inner classes
+
+
+
+-------------------FINAL METHODS ****************VERY IMPORTANT
+There are two reasons for final methods. The first is to put a “lock” on the method to prevent
+any inheriting class from changing its meaning. This is done for design reasons when you
+want to make sure that a method’s behavior is retained during inheritance and cannot be
+overridden.
+The second reason for final methods is efficiency. In earlier implementations of Java, if you
+made a method final, you allowed the compiler to turn any calls to that method into inline
+calls. When the compiler saw a final method call, it could (at its discretion) skip the normal
+approach of inserting code to perform the method call mechanism (push arguments on the
+stack, hop over to the method code and execute it, hop back and clean off the stack
+arguments, and deal with the return value) and instead replace the method call with a copy of
+the actual code in the method body. This eliminated the overhead of the method call. Of
+course, if a method is big, then your code begins to bloat, and you probably wouldn’t see any
+performance gains from inlining, since any improvements will be dwarfed by the amount of
+time spent inside the method
+
+
+
+VERY VERY VERY WELL WRITTEN BELOW WHICH WILL CLEAR ALL THE CONFUSION.-
+“Overriding” can only occur if something is part of the base-class interface. That is, you must
+be able to upcast an object to its base type and call the same method (the point of this will
+become clear in the next chapter). If a method is private, it isn’t part of the base-class
+interface. It is just some code that’s hidden away inside the class, and it just happens to have
+that name, but if you create a public, protected, or package-access method with the same
+name in the derived class, there’s no connection to the method that might happen to have
+that name in the base class. You haven’t overridden the method; you’ve just created a new
+method. Since a private method is unreachable and effectively invisible, it doesn’t factor
+into anything except for the code organization of the class for which it was defined.
+
+
+With Java SE5/6, you should let the compiler and JVM handle efficiency issues and make a
+method final only if you want to explicitly prevent overriding.
+---------------------FINAL CLASS
+When you say that an entire class is final (by preceding its definition with the final
+keyword), you state that you don’t want to inherit from this class or allow anyone else to do
+so
+
+
+class SmallBrain {}
+final class Dinosaur {
+int i = 7;
+int j = 1;
+SmallBrain x = new SmallBrain();
+void f() {}
+}
+//! class Further extends Dinosaur {}
+// error: Cannot extend final class ‘Dinosaur’
+public class Jurassic {
+public static void main(String[] args) {
+Dinosaur n = new Dinosaur();
+n.f();
+n.i = 40;
+n.j++;
+}
+} ///:~
+Note that the fields of a final class can be final or not, as you choose. The same rules apply
+to final for fields regardless of whether the class is defined as final. However, because it
+prevents inheritance, all methods in a final class are implicitly final, since there’s no way to
+override them. You can add the final specifier to a method in a final class, but it doesn’t add
+any meaning.
+
+
+
+
+
+
+
+
+
+
+--------------------------------- POLYMORPHISM (also called dynamic binding or late binding or run-time binding)
+wouldn’t it be nice if you
+could forget that there are derived classes, and write your code to talk only to the base class?
+That’s exactly what polymorphism allows you to do
+FOLLOWING EXAMPLE FOR POLYMORPHISM:=
+==================
+enum Note {
+MIDDLE_C, C_SHARP, B_FLAT; // Etc.
+}
+
+class Instrument {
+void play(Note n) {
+	System.out.println("Instrument.play()");
+}
+}
+
+class Wind extends Instrument {
+void play(Note n) {
+	System.out.println("Wind.play() " + n);
+}
+} 
+class testingJava {
+	public static void tune(Instrument i) {
+			i.play(Note.MIDDLE_C);
+		}
+		public static void main(String[] args) {
+			Wind flute = new Wind();
+			tune(flute); 
+	}
+}
+================== **************************REFER TO PAGE 197 OF THINKING IN JAVA TO UNDERSTAND POLYMORPHISM
+
+All method binding in Java uses late binding unless the method is static or final (private
+methods are implicitly final). This means that ordinarily you don’t need to make any
+decisions about whether late binding will occur—it happens automatically.
+
+final prevents anyone from
+overriding that method. Perhaps more important, it effectively “turns off” dynamic binding,
+
+ polymorphism is an important technique for the
+programmer to “separate the things that change from the things that stay the same.”
+
+
+
+--------------------PRIVATE METHOD IS AUTOMATIC FINAL AND IS HIDDEN TO THE DERIVED CLASSES so they cant be overridden. just refer following to clear this
+//: polymorphism/PrivateOverride.java
+// Trying to override a private method.
+package polymorphism;
+import static net.mindview.util.Print.*;
+public class PrivateOverride {
+private void f() { print("private f()"); }
+public static void main(String[] args) {
+PrivateOverride po = new Derived();
+po.f();
+}
+}
+class Derived extends PrivateOverride {
+public void f() { print("public f()"); }
+} /* Output:
+private f()
+*///:~
+You might reasonably expect the output to be “public f( )”, but a private method is
+automatically final, and is also hidden from the derived class. So Derived’s f( ) in this case
+is a brand new method; it’s not even overloaded, since the base-class version of f( ) isn’t
+visible in Derived.
+
+
+
+************** static methods vs POLYMORPHISM
+If a method is static, it doesn’t behave polymorphically.
+static methods are associated with the class, and not the individual objects
+
+********************** CONSTRUCTORS VS POLYMORPHISM
+constructors are static methods but static is implicit.
+
+class Meal {
+Meal() { print("Meal()"); }
+}
+class Bread {
+Bread() { print("Bread()"); }
+}
+class Cheese {
+Cheese() { print("Cheese()"); }
+}
+class Lettuce {
+Lettuce() { print("Lettuce()"); }
+}
+class Lunch extends Meal {
+Lunch() { print("Lunch()"); }
+}
+class PortableLunch extends Lunch {
+PortableLunch() { print("PortableLunch()");}
+}
+public class Sandwich extends PortableLunch {
+private Bread b = new Bread();
+private Cheese c = new Cheese();
+private Lettuce l = new Lettuce();
+public Sandwich() { print("Sandwich()"); }
+public static void main(String[] args) {
+new Sandwich();
+}
+} 
+
+
+*********************************** destructor order
+The order of disposal should be the reverse of
+the order of initialization, in case one subobject is dependent on another
+
+ you should
+perform the derived-class cleanup first, then the base-class cleanup. That’s because the
+derived-class cleanup could call some methods in the base class that require the base-class
+components to be alive, so you must not destroy them prematurely. 
+
+
+-----------------reference counting aids desctructer
+if one of these member objects is shared with one
+or more other objects, the problem becomes more complex and you cannot simply assume
+that you can call dispose( ). In this case, reference counting may be necessary to keep track
+of the number of objects that are still accessing a shared object. Here’s what it looks like:
+
+
+---------------------overriding inside constructor #######very interesting:
+class Glyph {
+void draw() { print("Glyph.draw()"); }
+Glyph() {
+print("Glyph() before draw()");
+draw();
+print("Glyph() after draw()");
+}
+}
+class RoundGlyph extends Glyph {
+private int radius = 1;
+RoundGlyph(int r) {
+radius = r;
+print("RoundGlyph.RoundGlyph(), radius = " + radius);
+}
+void draw() {
+print("RoundGlyph.draw(), radius = " + radius);
+}
+}
+public class PolyConstructors {
+public static void main(String[] args) {
+210 Thinking in Java Bruce Eckel
+ new RoundGlyph(5);
+}
+}
+
+
+The
+only safe methods to call inside a constructor are those that are final in the base class.because
+these cant be overridden.
+
+---------------
+Java SE5 adds covariant return types, which means that an overridden method in a derived
+class can return a type derived from the type returned by the base-class method
+
+************************BELOW SNIPPET VERY USEFUL IN UNDERSTANDING DOWNCASTING
+class Useful {
+public void f() {}
+public void g() {}
+}
+class MoreUseful extends Useful {
+public void f() {}
+public void g() {}
+public void u() {}
+public void v() {}
+public void w() {}
+}
+public class RTTI {
+public static void main(String[] args) {
+Useful[] x = {
+new Useful(),
+new MoreUseful()
+};
+x[0].f();
+x[1].g();
+// Compile time: method not found in Useful:
+//! x[1].u();
+((MoreUseful)x[1]).u(); // Downcast/RTTI
+((MoreUseful)x[0]).u(); // Exception thrown
+}
+}
+AT RUNTIME, RTTI is done. Run time type identification. ClassCastException is thrown in case of mistake
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%% ABSTRACT CLASS AND METHODS
+A class containing abstract methods is called an abstract class. If a class contains one or more
+abstract methods, the class itself must be qualified as abstract. (Otherwise, the compiler gives you an error message.)
+
+
+If you inherit from an abstract class and you want to make objects of the new type, you must
+provide method definitions for all the abstract methods in the base class. If you don’t (and
+you may choose not to), then the derived class is also abstract, and the compiler will force
+you to qualify that class with the abstract keyword
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%	INTERFACE
+
+The interface keyword produces a completely abstract class, one
+that provides no implementation at all. It allows the creator to determine method names,
+argument lists, and return types, but no method bodies. An interface provides only a form,
+but no implementation.
+
+To create an interface, use the interface keyword instead of the class keyword. As with a
+class, you can add the public keyword before the interface keyword (but only if that
+interface is defined in a file of the same name). If you leave off the public keyword, you get
+package access, so the interface is only usable within the same package. An interface can also
+contain fields, but these are implicitly static and final
+
+
+the defualt access type of interface is package access.
+but the default access of method inside interface is PUBLIC.
+
+--------------------------
+Creating a method that behaves differently depending on the
+argument object that you pass it is called the Strategy design pattern.
+
+
+
+
+
+
+------------------------------------------------Extending an interface
+with inheritance
+You can easily add new method declarations to an interface by using inheritance, and you can
+also combine several interfaces into a new
+
+
+interface Monster {
+void menace();
+}
+interface DangerousMonster extends Monster {
+void destroy();
+}
+interface Lethal {
+void kill();
+}
+class DragonZilla implements DangerousMonster {
+public void menace() {}
+public void destroy() {}
+}
+
+ Normally, you can use
+extends with only a single class, but extends can refer to multiple base interfaces when
+building a new interface.
+
+
+
+NOTE:-Java doesn't support multiple inheritance. but above we can see it works in case of interface.
+You can implement multiple interfaces, but not extend multiple classes.
+
+
+-----------
+Because any fields you put into an interface are automatically static and final, the interface
+is a convenient tool for creating groups of constant values.
+The fields in an
+interface are automatically public, so that is not explicitly specified.
+
+public interface Months {
+int
+JANUARY = 1, FEBRUARY = 2, MARCH = 3,
+APRIL = 4, MAY = 5, JUNE = 6, JULY = 7,
+AUGUST = 8, SEPTEMBER = 9, OCTOBER = 10,
+NOVEMBER = 11, DECEMBER = 12;
+}
+
+
+Fields defined in interfaces cannot be "blank finals," but they can be initialized with non-
+constant expressions.
+
+Since the fields are static, they are initialized when the class is first loaded, which happens
+when any of the fields are accessed for the first time.
+
+The fields, of course, are not part of the interface. The values are stored in the static storage
+area for that interface.
+
+
+
+-------------------- NESTED INTERFACE
+Nesting interfaces
+Interfaces may be nested within classes and within other interfaces. Just skim through following code to know.
+class A {
+interface B {
+void f();
+}
+public class BImp implements B {
+public void f() {}
+}
+private class BImp2 implements B {
+public void f() {}
+}
+public interface C {
+void f();
+}
+class CImp implements C {
+public void f() {}
+}
+private class CImp2 implements C {
+public void f() {}
+}
+private interface D {
+void f();
+}
+private class DImp implements D {
+public void f() {}
+}
+public class DImp2 implements D {
+public void f() {}
+}
+public D getD() { return new DImp2(); }
+private D dRef;
+public void receiveD(D d) {
+dRef = d;
+dRef.f();
+}
+}
+interface E {
+interface G {
+void f();
+}
+// Redundant "public":
+public interface H {
+void f();
+}
+void g();
+// Cannot be private within an interface:
+//! private interface I {}
+}
+public class NestingInterfaces {
+                                                           
+3 Thanks to Martin Danner for asking about this during a seminar.
+ public class BImp implements A.B {
+public void f() {}
+}
+class CImp implements A.C {
+public void f() {}
+}
+// Cannot implement a private interface except
+// within that interface’s defining class:
+//! class DImp implements A.D {
+//! public void f() {}
+//! }
+class EImp implements E {
+public void g() {}
+}
+class EGImp implements E.G {
+public void f() {}
+}
+class EImp2 implements E {
+public void g() {}
+class EG implements E.G {
+public void f() {}
+}
+}
+public static void main(String[] args) {
+A a = new A();
+// Can’t access A.D:
+//! A.D ad = a.getD();
+// Doesn’t return anything but A.D:
+//! A.DImp2 di2 = a.getD();
+// Cannot access a member of the interface:
+//! a.getD().f();
+// Only another A can do anything with getD():
+A a2 = new A();
+a2.receiveD(a.getD());
+}
+}
+
+
+NOTE :  all interface elements must be public—are strictly enforced
+here, so an interface nested within another interface is automatically public and cannot be
+made private.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% inner classes
+If you want to make an object of the inner class anywhere except from within a non-static
+method of the outer class, you must specify the type of that object as
+OuterClassName.InnerClassName, as seen in main( )
+
+
+example: Parcel2.Contents c 
+
+the inner class object has access to outer class variables(methods and fields)(even the private ones) like it owns them.
+
+(((((((((((((((((very interesting lines below on inner class)))))))))))))))))
+So an inner class has automatic access to the members of the enclosing class. How can this
+happen? The inner class secretly captures a reference to the particular object of the enclosing
+class that was responsible for creating it. Then, when you refer to a member of the enclosing
+class, that reference is used to select that member. Fortunately, the compiler takes care of all
+these details for you, but now you can see that an object of an inner class can be created only
+in association with an object of the enclosing class (when, as you shall see, the inner class is
+non-static). Construction of the inner-class object requires the reference to the object of the
+enclosing class, and the compiler will complain if it cannot access that reference. Most of the
+time this occurs without any intervention on the part of the programmer.
+
+
+=============
+If you want to return outer class reference, use OUTERCLASSNAME.this, also only using this would return inner class reference.
+
+public class DotThis {
+void f() { System.out.println("DotThis.f()"); }
+public class Inner {
+public DotThis outer() {
+return DotThis.this;
+// A plain "this" would be Inner’s "this"
+}
+}
+public Inner inner() { return new Inner(); }
+public static void main(String[] args) {
+DotThis dt = new DotThis();
+DotThis.Inner dti = dt.inner();
+dti.outer().f();
+}
+} /* Output:
+DotThis.f()
+
+
+
+-------------following is creating inner class directly
+// Creating an inner class directly using the .new syntax.
+
+public class DotNew {
+	public class Inner {}
+		public static void main(String[] args) {
+			DotNew dn = new DotNew();
+			DotNew.Inner dni = dn.new Inner();
+	}
+}
+
+NOTE : we must use an object of the outer class to make an object of the inner class.
+also read about static inner class. they dont need object of the enclosing class to make new object. Instead we can
+directly make object of static inner classes and they dont have access to non static outer class members.
+
+
+We can declare inner classes as private or protected but outer class should always be package access or public.
+
+
+%%%%%%%%%%%%%%% ANONYMOUS CLASSES
+public class Parcel7 {
+public Contents contents() {
+	return new Contents() { // Insert a class definition
+		private int i = 11;
+		public int value() { return i; }
+	}; // Semicolon required in this case
+}
+public static void main(String[] args) {
+	Parcel7 p = new Parcel7();
+	Contents c = p.contents();
+}
+}
+
+
+-------
+What this strange syntax means is "Create an object of an anonymous class that’s inherited
+from Contents." The reference returned by the new expression is automatically upcast to a
+Contents reference. The anonymous inner-class syntax is a shorthand for:
+//: innerclasses/Parcel7b.java
+// Expanded version of Parcel7.java
+public class Parcel7b {
+class MyContents implements Contents {
+private int i = 11;
+public int value() { return i; }
+}
+public Contents contents() { return new MyContents(); }
+public static void main(String[] args) {
+Parcel7b p = new Parcel7b();
+Contents c = p.contents();
+}
+}

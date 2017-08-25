@@ -1,0 +1,37 @@
+double brace initialization example:
+
+private static final Set<String> VALID_CODES = new HashSet<String>() {{
+add("XZ13s");
+add("AB21/X");
+add("YYLEX");
+add("AR2D");
+}};
+
+
+------------------------------------------------------------------------------------------------------------------------
+//any static block is executed before main
+class Myjava {
+    static
+    {
+        System.out.println("GeeksforGeeks");
+    }
+    public static void main(String args[])
+    {
+    }
+}
+
+
+-----------------------------------
+private methods can be overridden in inheritance, i think. not clear page 186 thinking in java
+
+read page 189-190 very useful information
+
+
+NOTE: not covered page 207 properly
+
+
+NOte: i found written "ther methods can take the interface as an argument, in order to create more general-purpose code."
+
+following method for copying arrays.
+//System.arraycopy( input, 0, this.input, 0, input.length );
+//System.arraycopy( weight, 0, this.weight, 0, weight.length );
