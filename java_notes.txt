@@ -1405,3 +1405,11 @@ for(Integer i : c)
 System.out.print(i + ", ");
 }
 }
+
+
+----------------Collections.addAll( )
+The constructor for a Collection can accept another Collection which it uses for
+initializing itself, so you can use Arrays.asList( ) to produce input for the constructor.
+However, Collections.addAll( ) runs much faster, and it’s just as easy to construct the
+Collection with no elements and then call Collections.addAll( ), so this is the preferred
+approach.

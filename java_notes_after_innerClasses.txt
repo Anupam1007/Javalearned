@@ -1,0 +1,414 @@
+------------- CONTAINERS
+import java.util.*;
+public class SimpleCollection {
+public static void main(String[] args) {
+Collection<Integer> c = new ArrayList<Integer>();
+for(int i = 0; i < 10; i++)
+c.add(i); // Autoboxing
+for(Integer i : c)
+System.out.print(i + ", ");
+}
+}
+
+
+------------ Collections.addAll  vs Arrays.asList
+
+The constructor for a Collection can accept another Collection which it uses for
+initializing itself, so you can use Arrays.asList( ) to produce input for the constructor.
+However, Collections.addAll( ) runs much faster, and it’s just as easy to construct the
+Collection with no elements and then call Collections.addAll( ), so this is the preferred
+approach.
+following snippet (incomplete) will show this
+
+Collection<Integer> collection =new ArrayList<Integer>(Arrays.asList(1, 2, 3, 4, 5));
+
+Integer[] moreInts = { 6, 7, 8, 9, 10 };
+collection.addAll(Arrays.asList(moreInts));
+
+
+The Collection.addAll( ) member method can only take an argument of another
+Collection object, so it is not as flexible as Arrays.asList( ) or Collections.addAll( ),
+which use variable argument lists
+
+
+-------- MAP
+Map<String,String> map;
+map.put("a","b");
+
+
+^^^^^^^******************
+import java.util.*;
+import static net.mindview.util.Print.*;
+public class PrintingContainers {
+static Collection fill(Collection<String> collection) {
+collection.add("rat");
+collection.add("cat");
+collection.add("dog");
+collection.add("dog");
+return collection;
+}
+static Map fill(Map<String,String> map) {
+map.put("rat", "Fuzzy");
+map.put("cat", "Rags");
+map.put("dog", "Bosco");
+map.put("dog", "Spot");
+return map;
+}
+public static void main(String[] args) {
+print(fill(new ArrayList<String>()));
+print(fill(new LinkedList<String>()));
+print(fill(new HashSet<String>()));
+print(fill(new TreeSet<String>()));
+print(fill(new LinkedHashSet<String>()));
+print(fill(new HashMap<String,String>()));
+print(fill(new TreeMap<String,String>()));
+print(fill(new LinkedHashMap<String,String>()));
+}
+} /* Output:
+[rat, cat, dog, dog]
+[rat, cat, dog, dog]
+[dog, cat, rat]
+Holding Your Objects 281 
+[cat, dog, rat]
+[rat, cat, dog]
+{dog=Spot, cat=Rags, rat=Fuzzy}
+{cat=Rags, dog=Spot, rat=Fuzzy}
+{rat=Fuzzy, cat=Rags, dog=Spot}
+*///:~
+This shows the two primary categories in the Java container library. The distinction is based
+on the number of items that are held in each "slot" in the container. The Collection category
+only holds one item in each slot. It includes the List, which holds a group of items in a
+specified sequence, the Set, which only allows the addition of one identical item, and the
+Queue, which only allows you to insert objects at one "end" of the container and remove
+objects from the other "end" (for the purposes of this example, this is just another way of
+looking at a sequence and so it is not shown). A Map holds two objects, a key and an
+associated value, in each slot.
+
+------------------important below line
+When deciding whether an element is part of a List, discovering the index of an element, and
+removing an element from a List by reference, the equals( ) method (part of the root class
+Object) is used. Eg
+The removeAll( ) method also operates based on the equals( ) method. As the name
+implies, it removes all the objects from the List that are in the argument List. 
+
+
+----------------- ITERATOR
+The concept of an Iterator (another design pattern) can be used to achieve this abstraction.
+An iterator is an object whose job is to move through a sequence and select each object in
+that sequence without the client programmer knowing or caring about the underlying
+structure of that sequence.
+
+1.Ask a Collection to hand you an Iterator using a method called iterator( ). That
+Iterator will be ready to return the first element in the sequence.
+Get the next object in the sequence with next( ).
+3. See if there are any more objects in the sequence with hasNext( ).
+4. Remove the last element returned by the iterator with remove( ).
+
+
+An Iterator will also remove the last element produced by next( ), which means you must
+call next( ) before you call remove( ). 
+
+--------------------LISTITERATOR
+
+While Iterator can only move forward, ListIterator is bidirectional. It can also
+produce the indexes of the next and previous elements relative to where the iterator is
+pointing in the list, and it can replace the last element that it visited using the set( ) method.
+
+
+You can produce a ListIterator that points to the beginning of the List by calling
+listIterator( ), and you can also create a ListIterator that starts out pointing to an index n
+in the list by calling listIterator(n). Here’s an example that demonstrates all these abilities:
+
+ListIterator<Pet> it = pets.listIterator(); //syntax
+
+
+while(it.hasNext())
+System.out.print(it.next() + ", " + it.nextIndex() +
+", " + it.previousIndex() + "; ");
+System.out.println();
+// Backwards:
+while(it.hasPrevious())
+System.out.print(it.previous().id() + " ");
+System.out.println();
+System.out.println(pets);
+
+
+//below block is not checked by me
+it = pets.listIterator(3);
+while(it.hasNext()) {
+it.next();
+it.set(Pets.randomPet()); //replaces randomly starting index 3 onwards
+
+
+--------------- LinkedList
+LinkedList also adds methods that allow it to be used as a stack, a Queue or a double-
+ended queue (deque)
+
+
+Some of these methods are aliases or slight variations of each other, to produce names that
+are more familiar within the context of a particular usage (Queue, in particular). For
+example, getFirst( ) and element( ) are identical—they return the head (first element) of
+the list without removing it, and throw NoSuchElementException if the List is empty.
+peek( ) is a slight variation of those two that returns null if the list is empty.
+removeFirst( ) and remove( ) are also identical—they remove and return the head of the
+list, and throw NoSuchElementException for an empty list, and poll( ) is a slight
+variation that returns null if this list is empty.
+addFirst( ) inserts an element at the beginning of the list.
+offer( ) is the same as add( ) and addLast( ). They all add an element to the tail (end) of a
+list.
+removeLast( ) removes and returns the last element of the list.
+
+To implement LinkedList as  Queue interface, you’ll see the element( ), offer( ), peek( ),
+poll( ) and remove( ) .
+
+
+------------------ creating our own Stack
+package net.mindview.util;
+import java.util.LinkedList;
+public class Stack<T> {
+private LinkedList<T> storage = new LinkedList<T>();
+public void push(T v) { storage.addFirst(v); }
+public T peek() { return storage.getFirst(); }
+public T pop() { return storage.removeFirst(); }
+public boolean empty() { return storage.isEmpty(); }
+public String toString() { return storage.toString(); }
+} ///:~
+This introduces the simplest possible example of a class definition using generics. The <T>
+after the class name tells the compiler that this will be a parameterized type, and that the
+type parameter—the one that will be substituted with a real type when the class is used—is T.
+Basically, this says, "We’re defining a Stack that holds objects of type T." The Stack is
+implemented using a LinkedList, and the LinkedList is also told that it is holding type T.
+Notice that push( ) takes an object of type T, while peek( ) and pop( ) return an object of
+type T. The peek( ) method provides you with the top element without removing it from the
+top of the stack, while pop( ) removes and returns the top element.
+
+
+
+--------------SET 
+A Set refuses to hold more than one instance of each object value. If you try to add more than
+one instance of an equivalent object, the Set prevents duplication. The most common use for
+a Set is to test for membership, so that you can easily ask whether an object is in a Set.
+Because of this, lookup is typically the most important operation for a Set, so you’ll usually
+choose a HashSet implementation, which is optimized for rapid lookup.
+
+Set has the same interface as Collection, so there isn’t any extra functionality like there is
+in the two different types of List. Instead, the Set is exactly a Collection—it just has
+different behavior. 
+See below Example:=
+
+import java.util.*;
+public class SetOfInteger {
+public static void main(String[] args) {
+Random rand = new Random(47);
+Set<Integer> intset = new HashSet<Integer>();
+for(int i = 0; i < 10000; i++)
+intset.add(rand.nextInt(30));
+System.out.println(intset);
+}
+} /* Output:
+[15, 8, 23, 16, 7, 22, 9, 21, 6, 1, 29, 14, 24, 4, 19, 26, 11, 18, 3,
+12, 27, 17, 2, 13, 28, 20, 25, 10, 5, 0]
+
+
+TreeSet keeps elements sorted into
+a red-black tree data structure, whereas HashSet uses the hashing function.
+LinkedHashSet also uses hashing for lookup speed, but appears to maintain elements in
+insertion order using a linked list.
+
+
+If you want the results to be sorted, one approach is to use a TreeSet instead of a HashSet:
+
+
+
+---------example of set just read it for clarity or try it
+import java.util.*;
+import static net.mindview.util.Print.*;
+public class SetOperations {
+Holding Your Objects 293 
+ public static void main(String[] args) {
+Set<String> set1 = new HashSet<String>();
+Collections.addAll(set1,
+"A B C D E F G H I J K L".split(" "));
+set1.add("M");
+print("H: " + set1.contains("H"));
+print("N: " + set1.contains("N"));
+Set<String> set2 = new HashSet<String>();
+Collections.addAll(set2, "H I J K L".split(" "));
+print("set2 in set1: " + set1.containsAll(set2));
+set1.remove("H");
+print("set1: " + set1);
+print("set2 in set1: " + set1.containsAll(set2));
+set1.removeAll(set2);
+print("set2 removed from set1: " + set1);
+Collections.addAll(set1, "X Y Z".split(" "));
+print("‘X Y Z’ added to set1: " + set1);
+}
+} /* Output:
+H: true
+N: false
+set2 in set1: true
+set1: [D, K, C, B, L, G, I, M, A, F, J, E]
+set2 in set1: false
+set2 removed from set1: [D, C, B, G, M, A, F, E]
+‘X Y Z’ added to set1: [Z, D, C, B, G, M, A, F, Y, X, E]
+
+
+---------------------------	Map
+A very good program to see random number generated and its frequency:
+
+import java.util.*;
+public class Statistics {
+public static void main(String[] args) {
+Random rand = new Random(47);
+Map<Integer,Integer> m =
+new HashMap<Integer,Integer>();
+for(int i = 0; i < 10000; i++) {
+// Produce a number between 0 and 20:
+int r = rand.nextInt(20);
+Integer freq = m.get(r);
+m.put(r, freq == null ? 1 : freq + 1);
+}
+System.out.println(m);
+}
+}
+Output:
+{15=497, 4=481, 19=464, 8=468, 11=531, 16=533, 18=478, 3=508, 7=471,
+12=521, 17=509, 2=489, 13=506, 9=549, 6=519, 1=502, 14=477, 10=513,
+5=503, 0=481}
+
+
+NOTE:In main( ), autoboxing converts the randomly generated int into an Integer reference that
+can be used with the HashMap (you can’t use primitives with containers).
+
+To see if a map contains a key or a value? use containsKey() or containsValue()
+
+
+
+
+-------- following  to use another collection inside map   Map<Person, List<Pet>>
+Maps, like arrays and Collections, can easily be expanded to multiple dimensions; you
+simply make a Map whose values are Maps (and the values of those Maps can be other
+containers, even other Maps). Thus, it’s quite easy to combine containers to quickly produce
+powerful data structures. For example, suppose you are keeping track of people who have
+multiple pets—all you need is a Map<Person, List<Pet>>
+
+
+
+
+
+
+
+
+
+
+--------------------- Queue
+LinkedList has methods to support queue behavior and it implements the Queue interface,
+so a LinkedList can be used as a Queue implementation. By upcasting a LinkedList to a
+Queue, this example uses the Queuespecific methods in the Queue interface:
+//: holding/QueueDemo.java
+// Upcasting to a Queue from a LinkedList.
+import java.util.*;
+public class QueueDemo {
+public static void printQ(Queue queue) {
+while(queue.peek() != null)
+System.out.print(queue.remove() + " ");
+System.out.println();
+}
+public static void main(String[] args) {
+Queue<Integer> queue = new LinkedList<Integer>();
+Random rand = new Random(47);
+for(int i = 0; i < 10; i++)
+298 Thinking in Java Bruce Eckel
+Holding Your Objects 299 
+queue.offer(rand.nextInt(i + 10));
+printQ(queue);
+Queue<Character> qc = new LinkedList<Character>();
+for(char c : "Brontosaurus".toCharArray())
+qc.offer(c);
+printQ(qc);
+}
+} /* Output:
+8 1 1 1 5 14 3 1 0 1
+B r o n t o s a u r u s
+*///:~
+offer( ) is one of the Queue-specific methods; it inserts an element at the tail of the queue if
+it can, or returns false. Both peek( ) and element( ) return the head of the queue without
+removing it, but peek( ) returns null if the queue is empty and element( ) throws
+NoSuchElementException. Both poll( ) and remove( ) remove and return the head of
+the queue, but poll( ) returns null if the queue is empty, while remove( ) throws
+NoSuchElementException.
+
+
+777777777$$$$$$$$$$$************** important Priority Queue
+When you offer( ) an object onto a PriorityQueue, that object is sorted into the queue. 5
+The default sorting uses the natural order of the objects in the queue, but you can modify the
+order by providing your own Comparator. The PriorityQueue ensures that when you call
+peek( ), poll( ) or remove( ), the element you get will be the one with the highest priority.
+
+
+
+----------- for each implementation for collection
+public class ForEachCollections {
+public static void main(String[] args) {
+Collection<String> cs = new LinkedList<String>();
+Collections.addAll(cs,
+"Take the long way home".split(" "));
+for(String s : cs)
+System.out.print("‘" + s + "‘ ");
+}
+}
+
+
+following is good, i liked it
+
+The reason that this works is that Java SE5 introduced a new interface called Iterable which
+contains an iterator( ) method to produce an Iterator, and the Iterable interface is what
+foreach uses to move through a sequence. So if you create any class that implements
+Iterable, you can use it in a foreach statement:
+//: holding/IterableClass.java
+// Anything Iterable works with foreach.
+import java.util.*;
+public class IterableClass implements Iterable<String> {
+protected String[] words = ("And that is how " +
+"we know the Earth to be banana-shaped.").split(" ");
+public Iterator<String> iterator() {
+	return new Iterator<String>() {
+	private int index = 0;
+	public boolean hasNext() {
+	return index < words.length;
+	}
+	public String next() { return words[index++]; }
+	public void remove() { // Not implemented
+	throw new UnsupportedOperationException();
+	}
+};
+}
+public static void main(String[] args) {
+for(String s : new IterableClass())
+System.out.print(s + " ");
+}
+} /* Output:
+And that is how we know the Earth to be banana-shaped.
+
+
+
+
+----------- Arrays are not iterable although foreach works for them also but not as iterator, see below
+
+In Java SE5, a number of classes have been made Iterable, primarily all Collection classes
+(but not Maps). For example, this code displays all the operating system environment
+variables:
+//: holding/EnvironmentVariables.java
+import java.util.*;
+public class EnvironmentVariables {
+public static void main(String[] args) {
+for(Map.Entry entry: System.getenv().entrySet()) {
+System.out.println(entry.getKey() + ": " +
+entry.getValue());
+}
+}
+} /* (Execute to see output) *///:~
+System.getenv( ) 7 returns a Map, entrySet( ) produces a Set of Map.Entry elements,
+and a Set is Iterable so it can be used in a foreach loop.
+A foreach statement works with an array or anything Iterable, but that doesn’t mean that an
+array is automatically an Iterable, nor is there any autoboxing that takes place
