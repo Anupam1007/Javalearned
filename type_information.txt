@@ -1,0 +1,295 @@
+----------------- TYPE INFORMATION
+
+
+//Following please read
+import java.util.*;
+abstract class Shape {
+void draw() { System.out.println(this + ".draw()"); }
+abstract public String toString();
+}
+class Circle extends Shape {
+public String toString() { return "Circle"; }
+}
+class Square extends Shape {
+public String toString() { return "Square"; }
+}
+class Triangle extends Shape {
+public String toString() { return "Triangle"; }
+}
+public class Shapes {
+public static void main(String[] args) {
+List<Shape> shapeList = Arrays.asList(
+new Circle(), new Square(), new Triangle()
+);
+for(Shape shape : shapeList)
+shape.draw();
+}
+} /* Output:
+Circle.draw()
+Square.draw()
+Triangle.draw()
+*///:~
+
+The base class contains a draw( ) method that indirectly uses toString( ) to print an
+identifier for the class by passing this to System.out.println( ) (notice that toString( ) is
+declared abstract to force inheritors to override it, and to prevent the instantiation of a
+plain Shape). If an object appears in a string concatenation expression (involving ‘+’ and
+String objects), the toString( ) method is automatically called to produce a String
+representation for that object. Each of the derived classes overrides the toString( ) method
+(from Object) so that draw( ) ends up (polymorphically) printing something different in
+each case.
+
+
+
+
+
+-----------------------
+But what if you have a special programming problem that’s easiest to solve if you know the
+exact type of a generic reference? For example, suppose you want to allow your users to
+highlight all the shapes of any particular type by turning them a special color. This way, they
+can find all the triangles on the screen by highlighting them. Or perhaps your method needs
+to "rotate" a list of shapes, but it makes no sense to rotate a circle so you’d like to skip the
+circles. With RTTI, you can ask a Shape reference the exact type that it’s referring to, and
+thus select and isolate special cases.
+
+
+
+-------------------
+interface HasBatteries {}
+interface Waterproof {}
+interface Shoots {}
+class Toy 
+{
+	// Comment out the following default constructor
+	// to see NoSuchMethodError from (*1*)
+	Toy() {}
+	Toy(int i) {}
+}
+class FancyToy extends Toy implements HasBatteries, Waterproof, Shoots {
+	FancyToy() { super(1); }
+}
+public class ToyTest {
+	static void printInfo(Class cc) {
+		System.out.println("Class name: " + cc.getName() +
+		" is interface? [" + cc.isInterface() + "]");
+		System.out.println("Simple name: " + cc.getSimpleName());
+		System.out.println("Canonical name : " + cc.getCanonicalName());
+	}
+public static void main(String[] args) {
+	Class c = null;
+	try {
+		c = Class.forName("FancyToy");
+	} catch(ClassNotFoundException e) {
+		System.out.println("Can’t find FancyToy");
+		System.exit(1);
+	}
+	printInfo(c);
+	for(Class face : c.getInterfaces())
+		printInfo(face);
+	Class up = c.getSuperclass();
+	Object obj = null;
+	try {
+		// Requires default constructor:
+		obj = up.newInstance();
+	} catch(InstantiationException e) {
+		System.out.println("Cannot instantiate");
+		System.exit(1);
+	} catch(IllegalAccessException e) {
+		System.out.println("Cannot access");
+		System.exit(1);
+	}
+	printInfo(obj.getClass());
+	}
+}
+
+
+The newlnstance( ) method of Class is a way to implement a "virtual constructor," which
+allows you to say, "I don’t know exactly what type you are, but create yourself properly
+anyway." In the preceding example, up is just a Class reference with no further type
+information known at compile time. And when you create a new instance, you get back an
+Object reference. But that reference is pointing to a Toy object. Of course, before you can
+send any messages other than those accepted by Object, you must investigate it a bit and do
+some casting. In addition, the class that’s being created with newlnstance( ) must have a
+default constructor. Later in this chapter, you’ll see how to dynamically create objects of
+classes using any constructor, with the Java reflection API.
+
+
+
+
+
+---------please read book, not writing notes here this time
+
+
+class Initable {
+static final int staticFinal = 47;
+static final int staticFinal2 =
+ClassInitialization.rand.nextInt(1000);
+static {
+System.out.println("Initializing Initable");
+}
+}
+class Initable2 {
+static int staticNonFinal = 147;
+static {
+System.out.println("Initializing Initable2");
+}
+}
+class Initable3 {
+static int staticNonFinal = 74;
+static {
+System.out.println("Initializing Initable3");
+}
+}
+public class ClassInitialization {
+public static Random rand = new Random(47);
+public static void main(String[] args) throws Exception {
+Class initable = Initable.class;
+System.out.println("After creating Initable ref");
+// Does not trigger initialization:
+System.out.println(Initable.staticFinal);
+// Does trigger initialization:
+System.out.println(Initable.staticFinal2);
+// Does trigger initialization:
+System.out.println(Initable2.staticNonFinal);
+Class initable3 = Class.forName("Initable3");
+System.out.println("After creating Initable3 ref");
+System.out.println(Initable3.staticNonFinal);
+}
+}
+
+
+Effectively, initialization is "as lazy as possible." From the creation of the initable reference,
+you can see that just using the .class syntax to get a reference to the class doesn’t cause
+initialization. However, Class.forName( ) initializes the class immediately in order to
+produce the Class reference, as you can see in the creation of initable3.
+If a static final value is a "compile-time constant," such as Initable.staticFinal, that
+value can be read without causing the Initable class to be initialized. Making a field static
+and final, however, does not guarantee this behavior: accessing Initable.staticFinal2
+forces class initialization because it cannot be a compile-time constant.
+If a static field is not final, accessing it always requires linking (to allocate storage for the
+field) and initialization (to initialize that storage) before it can be read, as you can see in the
+access to Initable2.staticNonFinal.
+
+
+
+
+
+
+
+------------------
+Generic class references
+A Class reference points to a Class object, which manufactures instances of classes and
+contains all the method code for those instances. It also contains the statics for that class. So
+a Class reference really does indicate the exact type of what it’s pointing to: an object of the
+class Class.
+However, the designers of Java SE5 saw an opportunity to make this a bit more specific by
+allowing you to constrain the type of Class object that the Class reference is pointing to,
+using the generic syntax. In the following example, both syntaxes are correct:
+//: typeinfo/GenericClassReferences.java
+public class GenericClassReferences {
+public static void main(String[] args) {
+Class intClass = int.class;
+Class<Integer> genericIntClass = int.class;
+genericIntClass = Integer.class; // Same thing
+intClass = double.class;
+// genericIntClass = double.class; // Illegal
+}
+}
+
+
+
+
+
+
+
+
+
+
+To loosen the constraints when using generic Class references, I employ the wildcard, which
+is part of Java generics. The wildcard symbol is ‘?’, and it indicates "anything." So we can add
+wildcards to the ordinary Class reference in the above example and produce the same
+results:
+//: typeinfo/WildcardClassReferences.java
+public class WildcardClassReferences {
+public static void main(String[] args) {
+Class<?> intClass = int.class;
+intClass = double.class;
+}
+} 
+----------note
+
+Class<Number> genericNumberClass = int.class;
+This would seem to make sense because Integer is inherited from Number. But this
+doesn’t work, because the Integer Class object is not a subclass of the Number Class
+Type Information 401 
+object (this may seem like a subtle distinction; we’ll look into it more deeply in the Generics
+chapter).
+
+------------
+
+In order to create a Class reference that is constrained to a type or any subtype, you
+combine the wildcard with the extends keyword to create a bound. So instead of just saying
+Class<Number>, you say:
+//: typeinfo/BoundedClassReferences.java
+public class BoundedClassReferences {
+public static void main(String[] args) {
+Class<? extends Number> bounded = int.class;
+bounded = double.class;
+bounded = Number.class;
+// Or anything else derived from Number.
+}
+}
+
+
+
+
+----------just skim through following
+Java SE5 also adds a casting syntax for use with Class references, which is the cast( )
+method:
+//: typeinfo/ClassCasts.java
+class Building {}
+class House extends Building {}
+Type Information 403 
+public class ClassCasts {
+public static void main(String[] args) {
+Building b = new House();
+Class<House> houseType = House.class;
+House h = houseType.cast(b);
+h = (House)b; // ... or just do this.
+}
+} ///:~
+The cast( ) method takes the argument object and casts it to the type of the Class reference.
+Of course, if you look at the above code it seems like a lot of extra work compared to the last
+line in main( ), which does the same thing.
+The new casting syntax is useful for situations where you can’t just use an ordinary cast. This
+usually happens when you’re writing generic code (which you’ll learn about in the Generics
+chapter), and you’ve stored a Class reference that you want to use to cast with at a later time.
+It turns out to be a rare thing—I found only one instance where cast( ) was used in the entire
+Java SE5 library (it was in com.sun.mirror.util.DeclarationFilter).
+
+----------
+In C++, the classic cast "(Shape)" does not perform RTTI. It simply tells the compiler to
+treat the object as the new type. In Java, which does perform the type check, this cast is often
+called a "type-safe downcast." The reason for the term "downcast" is the historical
+arrangement of the class hierarchy diagram. If casting a Circle to a Shape is an upcast, then
+casting a Shape to a Circle is a downcast. However, because it knows that a Circle is also a
+Shape, the compiler freely allows an upcast assignment, without requiring any explicit cast
+syntax. The compiler cannot know, given a Shape, what that Shape actually is—it could be
+exactly a Shape, or it could be a subtype of Shape, such as a Circle, Square, Triangle or
+some other type. At compile time, the compiler only sees a Shape. Thus, it won’t allow you to
+perform a downcast assignment without using an explicit cast, to tell it that you have extra
+information that allows you to know that it is a particular type (the compiler will check to see
+if that downcast is reasonable, so it won’t let you downcast to a type that’s not actually a
+subclass).
+----------------------Checking before a cast
+There’s a third form of RTTI in Java. This is the keyword instanceof, which tells you if an
+object is an instance of a particular type. It returns a boolean so you use it in the form of a
+question, like this:
+
+	if(x instanceof Dog)
+		((Dog)x).bark();
+		
+The if statement checks to see if the object x belongs to the class Dog before casting x to a
+Dog. It’s important to use instanceof before a downcast when you don’t have other
+information that tells you the type of the object; otherwise, you’ll end up with a
+ClassCastException.

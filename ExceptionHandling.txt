@@ -1,0 +1,184 @@
+Exception Handling
+
+In addition, you can throw any type of Throwable, which is the exception root class.
+Typically, you’ll throw a different class of exception for each different type of error. The
+information about the error is represented both inside the exception object and implicitly in
+the name of the exception class, so someone in the bigger context can figure out what to do
+with your exception. (Often, the only information is the type of exception, and nothing
+meaningful is stored within the exception object.)
+
+
+If you’re inside a method and you throw an exception (or another method that you call within
+this method throws an exception), that method will exit in the process of throwing. If you
+don’t want a throw to exit the method, you can set up a special block within that method to
+capture the exception. This is called the try block
+
+
+
+ Exception handlers
+immediately follow the try block and are denoted by the keyword catch:
+try {
+// Code that might generate exceptions
+} catch(Type1 id1)|{
+// Handle exceptions of Type1
+} catch(Type2 id2) {
+// Handle exceptions of Type2
+} catch(Type3 id3) {
+// Handle exceptions of Type3
+}
+
+
+
+The handlers must appear directly after the try block. If an exception is thrown, the
+exception-handling mechanism goes hunting for the first handler with an argument that
+matches the type of the exception. Then it enters that catch clause, and the exception is
+considered handled. The search for handlers stops once the catch clause is finished. Only the
+matching catch clause executes; it’s not like a switch statement in which you need a break
+after each case to prevent the remaining ones from executing. Note that within the try
+block, a number of different method calls might generate the same exception, but you need
+only one handler.
+
+
+-------------Termination vs. resumption
+There are two basic models in exception-handling theory. Java supportst termination, 3 in
+which you assume that the error is so critical that there’s no way to get back to where the
+exception occurred. Whoever threw the exception decided that there was no way to salvage
+the situation, and they don’t want to come back.
+
+---------------Creating your own exceptions
+To create your own exception class, you must inherit from an existing exception class.
+The most trivial way to create a new type of exception is just to let the compiler
+create the default constructor for you, so it requires almost no code at all:
+
+class SimpleException extends Exception {}
+public class InheritingExceptions {
+public void f() throws SimpleException {
+System.out.println("Throw SimpleException from f()");
+throw new SimpleException();
+}
+public static void main(String[] args) {
+InheritingExceptions sed = new InheritingExceptions();
+try {
+sed.f();
+} catch(SimpleException e) {
+System.out.println("Caught it!");
+}
+}
+} /* Output:
+Throw SimpleException from f()
+Caught it!
+
+
+
+------ printStackTrace( )
+catch(MyException e) {
+e.printStackTrace(System.out);
+}
+
+In the handlers, one of the Throwable (from which Exception is inherited) methods is
+called: printStackTrace( ).
+
+
+example of printStacktrace
+
+class MyException extends Exception {
+public MyException() {}
+public MyException(String msg) { super(msg); }
+}
+public class FullConstructors {
+public static void f() throws MyException {
+System.out.println("Throwing MyException from f()");
+throw new MyException();
+}
+public static void g() throws MyException {
+System.out.println("Throwing MyException from g()");
+throw new MyException("Originated in g()");
+}
+public static void main(String[] args) {
+try {
+f();
+} catch(MyException e) {
+e.printStackTrace(System.out);
+}
+try {
+g();
+} catch(MyException e) {
+e.printStackTrace(System.out);
+}
+}
+} /* Output:
+Throwing MyException from f()
+MyException
+at FullConstructors.f(FullConstructors.java:11)
+at FullConstructors.main(FullConstructors.java:19)
+Throwing MyException from g()
+MyException: Originated in g()
+at FullConstructors.g(FullConstructors.java:15)
+at FullConstructors.main(FullConstructors.java:24)
+
+
+
+
+
+
+
+
+ Here, the information is sent to System.out, and automatically captured and
+displayed in the output. However, if you call the default version:
+e.printStackTrace();
+the information goes to the standard error stream
+
+-----------------Exceptions and logging		java.util.logging
+
+An exception that reports through a Logger.
+
+
+
+//: exceptions/LoggingExceptions.java
+// An exception that reports through a Logger.
+import java.util.logging.*;
+import java.io.*;
+class LoggingException extends Exception {
+private static Logger logger =
+Logger.getLogger("LoggingException");
+public LoggingException() {
+StringWriter trace = new StringWriter();
+printStackTrace(new PrintWriter(trace));
+logger.severe(trace.toString());
+}
+}
+public class LoggingExceptions {
+public static void main(String[] args) {
+try {
+throw new LoggingException();
+} catch(LoggingException e) {
+System.err.println("Caught " + e);
+}
+try {
+throw new LoggingException();
+Error Handling with Exceptions 319 
+} catch(LoggingException e) {
+System.err.println("Caught " + e);
+}
+}
+} /* Output: (85% match)
+Aug 30, 2005 4:02:31 PM LoggingException <init>
+SEVERE: LoggingException
+at LoggingExceptions.main(LoggingExceptions.java:19)
+Caught LoggingException
+Aug 30, 2005 4:02:31 PM LoggingException <init>
+SEVERE: LoggingException
+at LoggingExceptions.main(LoggingExceptions.java:24)
+Caught LoggingException
+
+-------how to create logger and explanation of above code----
+The easiest way to write to a Logger is just to call the
+method associated with the level of logging message; here, severe( ) is used.
+To produce the
+String for the logging message, we’d like to have the stack trace where the exception is
+thrown, but printStackTrace( ) doesn’t produce a String by default. To get a String, we
+need to use the overloaded printStackTrace( ) that takes a java.io.PrintWriter object as
+an argument (all of this will be fully explained in the I/O chapter). 
+ If we hand the Print
+Writer constructor a java.io.StringWriter object, the output can be extracted as a String
+by calling toString( ).
